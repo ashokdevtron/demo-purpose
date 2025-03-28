@@ -15,10 +15,10 @@ In order to use these enhanced features, you can get an uninterrupted 14-day fre
 
 ***
 
-## Prerequisites
+### Prerequisites
 
 * [Helm CLI](https://helm.sh/docs/intro/install/#from-script) and [Kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) installed
-* Access to Kubernetes Cluster (having neither ArgoCD nor Argo Workflows installed)
+* Access to a Kubernetes cluster. If you wish to install Devtron in Full Mode (step 2 of Install Devtron Enterprise), ensure that neither ArgoCD nor Argo Workflows are installed in your cluster.
 * Download `ent-bom.yaml` using this command:
 
 ```bash
@@ -27,7 +27,7 @@ curl -O https://raw.githubusercontent.com/devtron-labs/utilities/main/scripts/de
 
 ***
 
-## Install Devtron Enterprise
+### Install Devtron Enterprise
 
 1. **Add Devtron Helm repository**
 
@@ -103,13 +103,13 @@ The dashboard URL will be: http://\<HOST\_IP>:/dashboard
 {% endtab %}
 {% endtabs %}
 
-You will see a `License Activation` screen upon visiting your Dashboard URL as shown below. If you already have a license key, paste it and click **Activate**. If not, you can [generate a fresh license key](broken-reference).
+You will see a `License Activation` screen upon visiting your Dashboard URL as shown below. If you already have a license key, paste it and click **Activate**. If not, you can generate a fresh license key.
 
 ![Figure 1: License Activation Screen](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/license-activation.jpg)
 
 ***
 
-## Generate License Key
+### Generate License Key
 
 1.  You will see an installation fingerprint that uniquely identifies your installation. Copy the fingerprint and click the **Get License** link.
 
@@ -140,19 +140,19 @@ In case your installation is not connected to the Internet, clicking the **Get L
 The license key you generate will be valid only for your enterprise installation. It is uniquely mapped to your installation fingerprint.
 {% endhint %}
 
-6.  Go back to your **License Activation** page (from [step 1](broken-reference)). Paste your license key and click **Activate**.
+6.  Go back to your **License Activation** page (from step 1). Paste your license key and click **Activate**.
 
     ![Figure 7: Pasting License Key and Activating](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/license-activation-3.jpg)
 
 {% hint style="info" %}
 #### Facing Issues?
 
-Visit the [Troubleshoot](broken-reference) section to identify the issue or connect with Devtron Support.
+Visit the Troubleshoot section to identify the issue or connect with Devtron Support.
 {% endhint %}
 
 ***
 
-## Log in to Devtron
+### Log in to Devtron
 
 1.  After successful license activation, you will see the Devtron login page.
 
@@ -174,9 +174,9 @@ After the initial login, we recommend you set up any Single Sign-On (SSO) servic
 
 ***
 
-## Additional Actions
+### Additional Actions
 
-### Check License Details
+#### Check License Details
 
 In Devtron, click the **Help** menu (top-right corner) → **About Devtron** to know the following:
 
@@ -186,19 +186,19 @@ In Devtron, click the **Help** menu (top-right corner) → **About Devtron** to 
 
 ![Figure 9: 'About Devtron' Help Menu](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/license-check.gif)
 
-### Update License
+#### Update License
 
 If you have a new license key, you can update the license key directly within Devtron, from the **About Devtron** page.
 
 ![Figure 10: Updating License](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/update-license.jpg)
 
-### Renew License
+#### Renew License
 
 If your trial license has expired and you wish to renew it, email us at enterprise@devtron.ai or reach out to your Devtron representative.
 
 ***
 
-## Troubleshoot Issues
+### Troubleshoot Issues
 
 | Issue                                                                                                                                                                                                        | What it means                                                        | Where is it shown                            | Solution                                                     |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------ |
