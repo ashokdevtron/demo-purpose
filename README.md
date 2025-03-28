@@ -1,210 +1,318 @@
-# Install Devtron Enterprise Trial
+# CD Pipeline
 
-## Introduction
+After your CI pipeline is ready, you can start building your CD pipeline. Devtron enables you to design your CD pipeline in a way that fully automates your deployments. Images from CI stage can be deployed to one or more environments through dedicated CD pipelines.
 
-With the Enterprise version of Devtron, you can access the premium features beyond the open-source version. For your advanced and challenging use cases, you get comprehensive enterprise features including but not limited to:
+## Creating CD Pipeline
 
-1. Release orchestration
-2. Resource monitoring
-3. Advanced filtering
-4. Fine-grained access control
-5. Security scans
-6. Policies related to approval, deployment, plugins, tags, infra...and many more.
+Click the '**+**' sign on CI Pipeline to attach a CD Pipeline to it.
 
-In order to use these enhanced features, you can get an uninterrupted 14-day free trial to explore and experience Devtron to its full potential.
+![Figure 1a: Adding CD Pipeline](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/creating-application/workflow-cd-pipeline/workflow-cd-v2.jpg)
 
-***
+A basic `Create deployment pipeline` window will pop up.
 
-### Prerequisites
+![Figure 1b: Creating CD Pipeline](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/creating-application/workflow-cd-pipeline/new-cd-pipeline.jpg)
 
-* [Helm CLI](https://helm.sh/docs/intro/install/#from-script) and [Kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) installed
-* Access to a Kubernetes cluster. If you wish to install Devtron in Full Mode (step 2 of Install Devtron Enterprise), ensure that neither ArgoCD nor Argo Workflows are installed in your cluster.
-* Download `ent-bom.yaml` using this command:
+Here, you get two tabs:
+* [New Deployment](#new-deployment) - Use this option to create new Helm/GitOps deployment.
+* [Migrate to Devtron](#migrate-to-devtron) - Use this option if you wish to migrate your existing Helm Release/Argo CD Apps to Devtron.
 
-```bash
-curl -O https://raw.githubusercontent.com/devtron-labs/utilities/main/scripts/devtron-oss-to-ent/ent-bom.yaml
-```
+---
 
-***
+## New Deployment
 
-### Install Devtron Enterprise
+The **New Deployment** tab displays the following sections:
 
-1. **Add Devtron Helm repository**
+* [Deploy to Environment](#deploy-to-environment)
+* [Deployment Strategy](#deployment-strategy)
+* [Advanced Options](#advanced-options)
 
-```bash
-kubectl create ns devtroncd
-helm repo add devtron https://helm.devtron.ai
-helm repo update devtron
-```
+### Deploy to Environment
 
-2. **Depending on your requirements, use any one of the following:**
+This section expects four inputs from you:
 
-{% tabs %}
-{% tab title="Devtron in Full Mode" %}
-To install Devtron with all the features, run the following command:
+| Setting     | Description                                                | Options                   |
+| ----------- | ---------------------------------------------------------- | ------------------------- |
+| Environment | Select the environment where you want to deploy your application | (List of available environments)  |
+| Namespace   | Automatically populated based on the selected environment | Not Applicable                           |
+| Trigger     | When to execute the deployment pipeline                   | **Automatic**: Deployment triggers automatically when a new image completes the previous stage (build pipeline or another deployment pipeline) <br /> **Manual**: Deployment is not initiated automatically. You can trigger deployment with a desired image. |
+| Deployment Approach | How to deploy the application | **Helm** or **GitOps** <br /> Refer [GitOps](../../global-configurations/gitops.md)  |
 
-```bash
-helm install devtron devtron/devtron-operator -f ent-bom.yaml --namespace devtroncd \
---set installer.modules={cicd} --set argo-cd.enabled=true --set security.enabled=true  \
---set notifier.enabled=true  --set security.trivy.enabled=true --set monitoring.grafana.enabled=true \
-```
-{% endtab %}
+### Deployment Strategy
 
-{% tab title="Devtron without integrations (only Dashboard)" %}
-To install Devtron with just the Dashboard and without integrations, run the following command:
+Devtron supports multiple deployment strategies depending on the [deployment chart type](../../creating-application/deployment-template.md#select-chart-from-default-charts). 
 
-```bash
-helm install -n devtroncd devtron  devtron/devtron-operator  -f ent-bom.yaml
-```
-{% endtab %}
-{% endtabs %}
+![Figure 2: Strategies Supported by Chart Type](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/creating-application/workflow-cd-pipeline/chart-and-strategy.jpg)
 
-3. **Obtain the Dashboard URL to access Devtron**
+Refer [Deployment Strategies](#deployment-strategies) to know more about each strategy in depth.
 
-{% tabs %}
-{% tab title="For EKS/AKS/GKE" %}
-Run the following command to get the Dashboard URL:
+The next section is [Advanced Options](#advanced-options) and it comes with additional capabilities. This option is available at the bottom of the `Create deployment pipeline` window. However, if you don't need them, you may proceed with a basic CD pipeline and click **Create Pipeline**. 
 
-```bash
-kubectl get svc -n devtroncd devtron-service -o jsonpath='{.status.loadBalancer.ingress}'
-```
+![Figure 3: Advanced Options](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/creating-application/workflow-cd-pipeline/advanced-option.jpg)
 
-You can access your Devtron Dashboard using the LoadBalancer URL displayed in the output.
-{% endtab %}
+Now, the window will have 3 distinct tabs, and you will see the following additions:
+* [Pre-Deployment stage (tab)](#pre-deployment-stage)
+* [Deployment stage (tab)](#deployment-stage)
+* [Post-Deployment stage (tab)](#post-deployment-stage)
 
-{% tab title="MicroK8s/Kind/K3s" %}
-Run the following command to port-forward the devtron service to port 8000
-
-```bash
-kubectl -n devtroncd port-forward service/devtron-service 8000:80
-```
-
-After port-forwarding, you can access the dashboard on this URL: http://127.0.0.1:8000
-{% endtab %}
-
-{% tab title="Minikube" %}
-To access the dashboard on Minikube cluster, run the following command:
-
-```bash
-minikube service devtron-service --namespace devtroncd
-```
-
-This will directly open the dashboard URL on your browser
-{% endtab %}
-
-{% tab title="Cloud VMs" %}
-Get devtron-service port number using the following command:
-
-```bash
-kubectl get svc -n devtroncd devtron-service -o jsonpath='{.spec.ports[0].nodePort}'
-```
-
-The dashboard URL will be: http://\<HOST\_IP>:/dashboard
-{% endtab %}
-{% endtabs %}
-
-You will see a `License Activation` screen upon visiting your Dashboard URL as shown below. If you already have a license key, paste it and click **Activate**. If not, you can generate a fresh license key.
-
-![Figure 1: License Activation Screen](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/license-activation.jpg)
-
-***
-
-### Generate License Key
-
-1.  You will see an installation fingerprint that uniquely identifies your installation. Copy the fingerprint and click the **Get License** link.
-
-    ![Figure 2: Copying Installation Fingerprint](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/license-activation-2.jpg)
+![Figure 4: Advanced Options (Expanded View)](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/creating-application/workflow-cd-pipeline/cd-advanced.jpg)
 
 {% hint style="info" %}
-#### What if my installation is airgapped and has no Internet access?
-
-In case your installation is not connected to the Internet, clicking the **Get License** link will display a QR code that you can scan with an Internet-enabled device to obtain a license ([check snapshot](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/qr-code-airgapped.jpg)).
+You can create or edit a deployment strategy in Advanced Options. Remember, only the default strategy will be used for deployment, so use the **SET DEFAULT** button to mark your preferred strategy as default after creating it.
 {% endhint %}
 
-2.  Log in to the **License Dashboard** using SSO or a valid work email. Personal email addresses are not allowed.
+### Pre-Deployment Stage
 
-    ![Figure 3: Log in to License Dashboard](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/license-sso-login.jpg)
-3.  From your work email address, the system will try to autopopulate the details in the form. If not, you can enter or modify the details too.
+If your deployment requires prior actions like DB migration, code quality check (QC), etc., you can use the `Pre-deployment stage` to configure such tasks.
 
-    ![Figure 4: Entering User Details](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/user-details.jpg)
-4.  Paste the fingerprint you copied earlier and click **Get License Key**.
+![Figure 5: Pre-deployment Stage](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/creating-application/workflow-cd-pipeline/cd-predeployment-v2.jpg)
 
-    ![Figure 5: Pasting Installation Fingerprint](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/pasted-fingerprint.jpg)
-5.  Your license will be generated. Copy the license key.
+1. **Tasks**
 
-    ![Figure 6: Copying Generated License Key](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/generated-license-key.jpg)
+Here you can add one or more tasks. The tasks can be re-arranged using drag-and-drop and they will be executed sequentially. 
+
+2. **Trigger Pre-Deployment Stage**
+
+Refer the trigger types from [here](#1-deploy-to-environment).
+
+3. **ConfigMaps & Secrets**
+
+{% hint style="info" %}
+### Prerequisites
+Make sure you have added [ConfigMaps](../config-maps.md) and [Secrets](../secrets.md) in App Configuration.
+{% endhint %}
+
+If you want to use some configuration files and secrets in pre-deployment stages or post-deployment stages, then you can use the `ConfigMaps` & `Secrets` options. You will get them as a drop-down in the pre-deployment stage.
+
+4. **Execute tasks in application environment**
+
+These `Pre-deployment CD / Post-deployment CD` pods can be created in your deployment cluster or the devtron build cluster. If your scripts/tasks has some dependency on the deployment environment, you may run these pods in the deployment cluster. Thus, your scripts \(if any\) can interact with the cluster services that may not be publicly exposed.
+
+Some tasks require extra permissions for the node where Devtron is installed. However, if the node already has the necessary permissions for deploying applications, there is no need to assign them again. Instead, you can enable the **Execute tasks in application environment** option for the pre-CD or post-CD steps. By default, this option is disabled.
+
+To enable the `Execute tasks in application environment` option, follow these steps:
+
+{% hint style="info" %}
+Make sure your cluster has [devtron-agent](../../global-configurations/cluster-and-environments.md#installing-devtron-agent) installed.
+{% endhint %}
+
+* Go to the chart store and search for the devtron-in-clustercd chart.
+
+  ![Figure 6: 'devtron-in-clustercd' Chart](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/creating-application/workflow-cd-pipeline/devtron-incluster-chart.jpg)
+
+* Configure the chart according to your requirements and deploy it in the target cluster.
+
+* After the deployment, edit the devtron-cm configmap and add the following key-value pair:
+
+  ```bash
+  ORCH_HOST: <host_url>/orchestrator/webhook/msg/nats
+
+  Example:
+
+  ORCH_HOST: http://xyz.devtron.com/orchestrator/webhook/msg/nats
+
+  ```
+
+  `ORCH_HOST` value should be same as of `CD_EXTERNAL_LISTENER_URL` value which is passed in values.yaml.
+
+  ![Figure 7: Configuration](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/creating-application/workflow-cd-pipeline/incluster-configuration.jpg)
+
+* Delete the Devtron pod using the following command:
+
+  ```bash
+  kubectl delete pod -l app=devtron -n devtroncd
+  ```
+
+* Again navigate to the chart store and search for the "migration-incluster-cd" chart.
+
+  ![Figure 8: 'migration-incluster-cd' chart](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/creating-application/workflow-cd-pipeline/migration-incluster-chart.jpg)
+
+* Edit the `cluster-name` and `secret name` values within the chart. The `cluster name` refers to the name used when adding the cluster in the global configuration and for which you are going to enable `Execute tasks in application environment` option.
+
+  ![Figure 9: Configuration](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/creating-application/workflow-cd-pipeline/migration-incluster.jpg)
+
+* Deploy the chart in any environment within the Devtron cluster. Now you should be able to enable `Execute tasks in application environment` option for an environment of target cluster.
+
+### Deployment Stage
+
+#### Pipeline Name
+
+Pipeline name will be auto-generated; however, you are free to modify the name as per your requirement.
+
+<!-- #### Manual Approval for Deployment [![](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/elements/EnterpriseTag.svg)](https://devtron.ai/pricing)
+
+If you want only approved images to be eligible for deployment, enable the `Manual approval for deployment` option in the respective deployment pipeline. By doing so, unapproved images would be prevented from being deployed for that deployment pipeline.
+
+{% hint style="info" %}
+Currently, only super-admins can enable or disable this option.
+{% endhint %}
+
+Users can also specify the number of approvals required for each deployment, where the permissible limit ranges from one approval (minimum) to six approvals (maximum). In other words, if the image doesn't get the specified number of approvals, it will not be eligible for deployment
+
+![Figure 6: Configuring Manual Approval of Images](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/creating-application/workflow-cd-pipeline/deployment-approval-new.jpg)
+
+To enable manual approval for deployment, follow these steps:
+
+1. Click the deployment pipeline for which you want to enable manual approval.
+2. Turn on the â€˜Manual approval for deploymentâ€™ toggle button.
+3. Select the number of approvals required for each deployment.
+
+To know more about the approval process, refer [Triggering CD](../../deploying-application/triggering-cd.md#manual-approval-for-deployment).  -->
+
+#### Custom Image Tag Pattern
 
 {% hint style="warning" %}
-#### Note
-
-The license key you generate will be valid only for your enterprise installation. It is uniquely mapped to your installation fingerprint.
+This will be utilized only when an existing container image is copied to another repository using the [Copy Container Image Plugin](../../plugins/copy-container-image.md). The image will be copied with the tag generated by the Image Tag Pattern you defined.
 {% endhint %}
 
-6.  Go back to your **License Activation** page (from step 1). Paste your license key and click **Activate**.
+1. Enable the toggle button as shown below.
 
-    ![Figure 7: Pasting License Key and Activating](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/license-activation-3.jpg)
+    ![Figure 10: Enabling Custom Image Tag Pattern](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/creating-application/workflow-cd-pipeline/cd-image-pattern.jpg)
+
+2. Click the edit icon.
+
+    ![Figure 11: Edit Icon](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/creating-application/workflow-cd-pipeline/edit-cd-image-tag.jpg)
+
+3. You can write an alphanumeric pattern for your image tag, e.g., **prod-v1.0.{x}**. Here, 'x' is a mandatory variable whose value will incrementally increase with every pre or post deployment trigger (that option is also available to you). You can also define the value of 'x' for the next trigger in case you want to change it. 
+
+    ![Figure 12: Defining Tag Pattern](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/creating-application/workflow-cd-pipeline/cd-image-tag.jpg)
+
+    {% hint style="warning" %}
+    Ensure your custom tag do not start or end with a period (.) or comma (,)
+    {% endhint %}
+
+4. Click **Update Pipeline**. 
+
+To know how and where this image tag would appear, refer [Copy Container Image Plugin](../../plugins/copy-container-image.md)
+
+#### Pull Container Image with Image Digest
+
+Although Devtron ensures that [image tags](#custom-image-tag-pattern) remain unique, the same cannot be said if images are pushed with the same tag to the same container registry from outside Devtron. 
+
+Therefore, to eliminate the possibility of pulling an unintended image, Devtron offers the option to pull container images using digest and image tag.
+
+![Figure 13: Pull with Image Digest](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/global-configurations/image-digest/pull-with-digest.jpg)
+
+An image digest is a unique and immutable SHA-256 string returned by the container registry when you push an image. So the image referenced by the digest will never change.
+
+![Figure 14: Tag@Digest](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/global-configurations/image-digest/tag-digest.jpg)
+
+
+{% hint style="warning" %}
+### Who Can Perform This Action?
+Users need to have Admin permission or above (along with access to the environment and application) to enable this option. However, this option will be non-editable in case the super-admin has enabled [pull image digest in Global Configurations](../../global-configurations/pull-image-digest.md).
+{% endhint %}
+
+### Post-Deployment Stage
+
+If you need to run any actions for e.g., closure of Jira ticket, load testing or performance testing, you can configure such actions in the post-deployment stages.
+
+Post-deployment stages are similar to pre-deployment stages. The difference is, pre-deployment executes before the deployment, while post-deployment occurs after.
+
+You can use [ConfigMap and Secrets](#configmaps--secrets) in post deployments as well. The option to execute tasks in application environment is available too.
+
+![Figure 15: Post-deployment Stage](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/creating-application/workflow-cd-pipeline/cd_post_build.jpg)
+
+---
+
+## Migrate to Devtron
 
 {% hint style="info" %}
-#### Facing Issues?
-
-Visit the Troubleshoot section to identify the issue or connect with Devtron Support.
+### When can I see this option?
+This option will be available only during the [creation of CD pipeline](#creating-cd-pipeline) in your workflow. Existing CD pipelines will not have this option.
 {% endhint %}
 
-***
+{% hint style="warning" %}
+### Who Can Perform This Action?
+Only superadmins can migrate existing Helm releases or Argo apps to Devtron
+{% endhint %}
 
-### Log in to Devtron
+If you already use external Helm or Argo CD for deployment and wish to try out Devtron, this feature helps you onboard and manage your external applications using Devtronâ€™s CI/CD capabilities, offering the following benefits:
 
-1.  After successful license activation, you will see the Devtron login page.
+* No hassle of manually migrating your existing applications
+* No need to set up a parallel Argo CD instance
+* No risk of losing your existing configurations
+* Use build pipeline in your workflow
+* Execute pre-deployment and post-deployment tasks
+* Scan your apps for vulnerabilities
+* Hibernate or restart your app
+* View config diff, deployment history, and all the capabilities that come with Devtron Apps
 
-    ![Figure 8: Devtron Login Page](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/admin-login.jpg)
-2. Initially, log in with the administrator credentials. By default, the username is **admin**. Run the following command to get the admin password:
+### Migrate Helm Release
 
-```bash
-kubectl -n devtroncd get secret devtron-secret \
--o jsonpath='{.data.ADMIN_PASSWORD}' | base64 -d
-```
+{% hint style="warning" %}
+### Prerequisites
+* Add your external cluster (containing your Helm Apps) in [Clusters & Environments](../../global-configurations/cluster-and-environments.md).
+* Your Helm release must use the same chart type as your application. If needed, you can upload or select the appropriate chart in **Global Configuration** â†’ **Deployment Charts**, then save the chart type at [base configuration](../deployment-template.md) of your application.
+{% endhint %}
+
+You can not only [view your external Helm apps](../../applications.md#view-external-helm-app-listing), but also manage their deployments using Devtron's CI/CD. 
+
+1. Click **Helm Release** in 'Select type of application to migrate'.
+
+2. Select the external cluster containing your Helm releases, and select the Helm release you wish to migrate.
+
+  ![Figure 16: Choosing External Cluster and Helm Release from Dropdown](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/creating-application/workflow-cd-pipeline/choose-cluster-app.jpg)
+
+3. The target cluster, its namespace, and environment would be visible. If the environment is not available, click **Add Environment**. This will open a new tab. Once you have [added the environment to your cluster](../../global-configurations/cluster-and-environments.md#add-environment-to-a-cluster), return and click the refresh button.
+
+  ![Figure 17: Adding Environment to Target](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/creating-application/workflow-cd-pipeline/add-env-helm.jpg)
+
+4. Select the trigger (**Automatic/Manual**) and click **Create Pipeline**. 
+
+  ![Figure 18: Creating CD Pipeline for Helm Release](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/creating-application/workflow-cd-pipeline/deploy-mode.jpg)
+
+5. Once the pipeline is created, you may go to [Build & Deploy](../../deploying-application/README.md) to trigger the pipelines. Your Helm release would be deployed using Devtron.
 
 {% hint style="info" %}
-#### Note
+### Limitations
+This feature comes with certain mentioned limitations and expectations. If your use case doesn't fit and goes beyond, feel free to [**open a feature request**](https://github.com/devtron-labs/devtron/issues).
 
-When you install Devtron for the first time, it creates a default admin user and password (with unrestricted access to Devtron). You can use it to log in as an administrator.
+* Apps deployed using Helm + manual kubectl, kubectl, kustomize + helm are not supported.
+* This feature is specifically designed for use cases where you need to change only the container image via CD flow.
+* An installed Helm app may have multiple `values.yaml`. With Devtron, user can modify only one (if multiple files need to be modified, they must be merged into a single `values.yaml`.)
+* Once onboarded to Devtron, the user should only use Devtron to manage the application and not do manual changes (outside of Devtron) on that onboarded Helm release.
+* Appâ€™s custom chart and its required versions, including image descriptors, must be added in Devtron.  
 
-After the initial login, we recommend you set up any Single Sign-On (SSO) service like Google, GitHub, etc., and then add other users (including yourself). Subsequently, all the users can use the same SSO (let's say, GitHub) to log in to the Dashboard.
 {% endhint %}
 
-***
+### Migrate Argo CD Application
 
-### Additional Actions
+You can not only [view your external Argo CD apps](../../applications.md#view-external-argocd-app-listing), but also manage their deployments using Devtron's CI/CD.
 
-#### Check License Details
+{% hint style="warning" %}
+### Prerequisites
+* Your app should be an Argo Helm app ([read about supported tools](https://argo-cd.readthedocs.io/en/stable/user-guide/application_sources/)).
+* It must have a single `values.yaml` file and a single Git source.
+* The `values.yaml` should be in git.
+* A target cluster and namespace must be available (in the application object).
+* Your Argo CD app must use the same chart type as your application. If needed, you can upload or select the appropriate chart in **Global Configuration** â†’ **Deployment Charts**. Then save the chart type at [base configuration](../deployment-template.md) of your application.
+* Add your external cluster (containing your Argo Apps) in [Clusters & Environments](../../global-configurations/cluster-and-environments.md).
+{% endhint %}
 
-In Devtron, click the **Help** menu (top-right corner) → **About Devtron** to know the following:
+1. Click **Argo CD Application** in 'Select type of application to migrate'.
 
-* License details (Key and Expiry)
-* Installation fingerprint
-* Enterprise version
+2. Select the external cluster containing your Argo apps, and select the Argo CD application you wish to migrate.
 
-![Figure 9: 'About Devtron' Help Menu](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/license-check.gif)
+  ![Figure 19: Choosing External Cluster and Argo App from Dropdown](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/creating-application/workflow-cd-pipeline/choose-cluster-app2.jpg)
 
-#### Update License
+3. The target cluster, its namespace, and environment would be visible. If the environment is not available, click **Add Environment**. This will open a new tab. Once you have [added the environment to your cluster](../../global-configurations/cluster-and-environments.md#add-environment-to-a-cluster), return and click the refresh button.
 
-If you have a new license key, you can update the license key directly within Devtron, from the **About Devtron** page.
+  ![Figure 20: Adding Environment to Target](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/creating-application/workflow-cd-pipeline/add-env-argo.jpg)
 
-![Figure 10: Updating License](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/update-license.jpg)
+4. Select the trigger (**Automatic/Manual**) and click **Create Pipeline**. 
 
-#### Renew License
+  ![Figure 21: Creating CD Pipeline for Argo CD App](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/creating-application/workflow-cd-pipeline/deploy-mode2.jpg)
 
-If your trial license has expired and you wish to renew it, email us at enterprise@devtron.ai or reach out to your Devtron representative.
+5. Once the pipeline is created, you may go to [Build & Deploy](../../deploying-application/README.md) to trigger the pipelines. Your Argo CD app would be deployed using Devtron.
 
-***
+{% hint style="info" %}
+### Limitations
+This feature comes with certain mentioned limitations and expectations. If your use case doesn't fit and goes beyond, feel free to [**open a feature request**](https://github.com/devtron-labs/devtron/issues).
 
-### Troubleshoot Issues
-
-| Issue                                                                                                                                                                                                        | What it means                                                        | Where is it shown                            | Solution                                                     |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------ |
-| <p><strong>License Claimed</strong><br><a href="https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/license-claimed.jpg">Snapshot</a></p>                               | Someone from your organization has already availed a license         | License Dashboard                            | Reach out to enterprise@devtron.ai for another trial         |
-| <p><strong>Invalid License Key</strong><br><a href="https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/invalid-license-key.jpg">Snapshot</a></p>                       | The license key is incorrect or partial                              | License Activation Page                      | Go to the License Dashboard and recheck the license          |
-| <p><strong>License Key No Longer Valid</strong><br><a href="https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/invalid-license-2.jpg">Snapshot</a></p>                 | The license key has become invalid for your installation fingerprint | License Activation Page                      | Generate a new license from License Dashboard.               |
-| <p><strong>Invalid Fingerprint</strong><br><a href="https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/invalid-fingerprint.jpg">Snapshot</a></p>                       | The fingerprint is incorrect or partial                              | License Dashboard                            | Go to the License Activation Page and verify the fingerprint |
-| <p><strong>License Has Expired</strong><br><a href="https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/expired-license.jpg">Snapshot</a></p>                           | You have exhausted the free trial                                    | License Activation Page or License Dashboard | Reach out to enterprise@devtron.ai for renewal               |
-| <p><strong>License Key Already Exists for Fingerprint</strong><br><a href="https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/key-already-exists.jpg">Snapshot</a></p> | You cannot generate more than 1 license key for 1 fingerprint        | License Dashboard                            | Contact Support                                              |
+* Appâ€™s custom chart and its required versions, including image descriptors, must be added in Devtron. 
+* The Git source type should be branch HEAD.
+* The cluster containing Argo applications and the target deployment cluster are both added in Devtron.
+* The target deployment clusterâ€™s endpoint in Devtron must be the same as the one configured in Argo CD.
+* The target deployment [environment exists in Devtron](../../global-configurations/cluster-and-environments.md#add-environment-to-a-cluster).
+* GitOps credentials required to commit in the Git repo have been configured in [Global Configurations](../../global-configurations/gitops.md).
+* The external Argo CD has auto-sync enabled or an a
