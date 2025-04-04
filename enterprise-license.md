@@ -1,6 +1,6 @@
 # Install Devtron Enterprise Trial
 
-### Introduction
+## Introduction
 
 With the Enterprise version of Devtron, you can access the premium features beyond the open-source version. For your advanced and challenging use cases, you get comprehensive enterprise features including but not limited to:
 
@@ -13,11 +13,22 @@ With the Enterprise version of Devtron, you can access the premium features beyo
 
 Enjoy an uninterrupted 14-day free trial and explore [all the features of Devtron Enterprise](https://devtron.ai/pricing) to their full potential.
 
+{% hint style="info" %}
+#### Already using Devtron's Open Source version?
+
+This guide is intended for fresh installation of **Devtron Enterprise**.\
+If you're currently using the open-source (OSS) version of Devtron, we **do not recommend** converting your existing setup to the Enterprise edition.
+
+Instead, we suggest you to perform a fresh installation of Devtron Enterprise for the best experience.
+{% endhint %}
+
 ***
 
 ### Install Devtron Enterprise
 
 {% hint style="warning" %}
+#### Note
+
 Please ensure that cluster `kubeconfig` is properly configured and available in your system.
 {% endhint %}
 
@@ -32,20 +43,26 @@ helm repo update devtron
 
 {% tabs %}
 {% tab title="Devtron in Full Mode" %}
-To install Devtron with all the features, run the following command:
+To install Devtron with all core enterprise features **except ArgoCD**:
 
 ```bash
-helm install devtron devtron/devtron-enterprise --create-namespace --namespace devtroncd \
---set devtron.installer.modules={cicd} --set devtron.argo-cd.enabled=true --set devtron.security.enabled=true  \
---set devtron.notifier.enabled=true  --set devtron.security.trivy.enabled=true --set devtron.monitoring.grafana.enabled=true
+helm install devtron devtron/devtron-enterprise --create-namespace --namespace devtroncd 
+```
+
+To include **ArgoCD** integration, add `--set devtron.argo-cd.enabled=true`:
+
+```bash
+helm install devtron devtron/devtron-enterprise --create-namespace --namespace devtroncd --set devtron.argo-cd.enabled=true
 ```
 {% endtab %}
 
 {% tab title="Devtron without integrations (only Dashboard)" %}
-To install Devtron with just the Dashboard and without integrations, run the following command:
+To install only the Devtron Dashboard (without CI/CD, ArgoCD, Security, Notification, or Monitoring):
 
 ```bash
-helm install devtron  devtron/devtron-operator --create-namespace --namespace devtroncd
+helm install devtron devtron/devtron-enterprise --create-namespace --namespace devtroncd \
+--set devtron.installer.modules={} --set devtron.security.enabled=false  \
+--set devtron.notifier.enabled=false  --set devtron.security.trivy.enabled=false --set devtron.monitoring.grafana.enabled=false
 ```
 {% endtab %}
 {% endtabs %}
@@ -112,7 +129,7 @@ You will see a `License Activation` screen upon visiting your Dashboard URL as s
 In case your installation is not connected to the Internet, clicking the **Get License** link will display a QR code that you can scan with an Internet-enabled device to obtain a license ([check snapshot](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/qr-code-airgapped.jpg)).
 {% endhint %}
 
-2.  Log in to the **License Dashboard** using SSO or a valid work email. Personal email addresses are not allowed.
+2.  Log in to the **License Dashboard** using SSO with a valid work email. Personal email addresses are not allowed.
 
     ![Figure 3: Log in to License Dashboard](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/install-devtron/ent-trial/license-sso-login.jpg)
 3.  From your work email address, the system will try to autopopulate the details in the form. If not, you can enter or modify the details too.
