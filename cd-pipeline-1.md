@@ -222,7 +222,7 @@ If you already use external Helm or Argo CD for deployment and wish to try out D
 #### Prerequisites
 
 * Add your external cluster (containing your Helm Apps) in Clusters & Environments.
-* Your Helm release must use the same chart type as your application. If needed, you can upload or select the appropriate chart in **Global Configuration** → **Deployment Charts**, then save the chart type at base configuration of your application.
+* Your Helm release must use the same chart type as your application. If needed, you can upload or select the appropriate chart in **Global Configurations** → **Deployment Charts**, then save the chart type at base configuration of your application.
 {% endhint %}
 
 You can not only view your external Helm apps, but also manage their deployments using Devtron's CI/CD.
@@ -264,7 +264,7 @@ You can not only view your external Argo CD apps, but also manage their deployme
 * GitOps credentials required to commit in the Git repo should be configured in Global Configurations.
 * The cluster containing your external Argo applications should be added to Devtron. Refer Clusters & Environments.
 * The target deployment cluster, its namespace, and its environment should be added to Devtron.
-* Your Argo CD app must use the same chart type as your application. If needed, you can upload or select the appropriate chart in **Global Configuration** → **Deployment Charts**. Then save the chart type at base configuration of your application.
+* Your Argo CD app must use the same chart type as your application. If needed, you can upload or select the appropriate chart in **Global Configurations** → **Deployment Charts**. Then save the chart type at base configuration of your application.
 * The external Argo CD should have auto-sync enabled or an alternative syncing mechanism, as Devtron does not perform manual syncs.
 {% endhint %}
 
