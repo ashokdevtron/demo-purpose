@@ -49,8 +49,8 @@ Install the chart in the cluster whose workloads you wish to troubleshoot.
   * **App Name**: Give a name to your app, e.g. `ai-agent-app`
   * **Project**: Select your project
   * **Deploy to environment**: Choose the target environment (should be associated with the same namespace used while creating secret key in [Step 2](broken-reference))
-  * **Chart Version**: Select `0.8.1` because Devtron has optimized for it
-  * **Chart Values**: Choose `Default 0.8.1`
+  * **Chart Version**: Select `0.0.1` because Devtron has optimized for it
+  * **Chart Values**: Choose `Default 0.0.1`
 * Configure the `values.yaml` and add the `additionalEnvVars` block given below, using the editor.
 
 ```yaml
