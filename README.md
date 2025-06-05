@@ -8,9 +8,7 @@ Devtron Intelligence is an AI assistant that helps you troubleshoot issues faste
 
 ### Tutorial
 
-{% embed url="https://www.youtube.com/watch?v=3EL5RyiwQFo" %}
-
-***
+{% embed url="https://youtu.be/3EL5RyiwQFo" %}
 
 ## Steps to Configure Devtron Intelligence
 
