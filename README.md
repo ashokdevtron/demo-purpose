@@ -8,7 +8,9 @@ Devtron Intelligence is an AI assistant that helps you troubleshoot issues faste
 
 ### Tutorial
 
-{% embed url="https://youtu.be/3EL5RyiwQFo" %}
+{% embed url="https://www.youtube.com/watch?v=oNP-YP-9XhM" %}
+
+***
 
 ## Steps to Configure Devtron Intelligence
 
@@ -69,7 +71,7 @@ additionalEnvVars:
         key: AiKey ## Key of the secret created in Step 2
         name: ai-secret ## Name of the secret created in Step 2
   - name: CLUSTER_NAME
-    value: document-nonprod
+    value: document-nonprod ## Name of the target cluster (optional)
 ```
 
 ![Figure 3: Chart Configuration](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/chart-config-v3.jpg)
