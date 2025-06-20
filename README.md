@@ -34,7 +34,7 @@ You can generate an API key for an LLM of your choice. Here, we will generate an
 
 ### 2. Encode your API Key
 
-Go to [strings.devtron.ai](https://strings.devtron.ai/) and encode your API key in base64. This base64 encoded key will be used while creating a secret in the next step.
+Go to [strings.is](https://string.is/base64-encoder) and encode your API key in base64. This base64 encoded key will be used while creating a secret in the next step.
 
 ### 3. Create Secret in Devtron
 
@@ -214,8 +214,8 @@ additionalEnvVars:
 
 Perform a hard refresh of the browser to clear the cache:
 
-* **Windows**: Hold down `Ctrl` and then press `F5`
 * **Mac**: Hold down `Cmd` and `Shift` and then press `R`
+* **Windows/Linux**: Hold down `Ctrl` and then press `F5`
 
 ***
 
