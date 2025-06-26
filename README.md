@@ -32,14 +32,18 @@ Devtron Intelligence supports all major large language models (LLM) e.g., OpenAI
 
 You can generate an API key for an LLM of your choice. Here, we will generate an API key from [OpenAI](https://platform.openai.com/account/api-keys).
 
-### 2. Encode your API Key
+### 2. Create Secret in Devtron
 
-Go to [strings.is](https://string.is/base64-encoder) and encode your API key in base64. This base64 encoded key will be used while creating a secret in the next step.
+There are 2 methods to create a secret in Devtron, follow the one you prefer:
 
-### 3. Create Secret in Devtron
+* [Method A: Using 'Create Resource'](broken-reference)
+* [Method B: Using kubectl command](broken-reference)
 
-1. Go to Devtron's **Resource Browser** → (Select Cluster) → **Create Resource**
-2. Paste the following YAML and replace the key with your base64-encoded OpenAI key. Also, enter the namespace where the [AI Agent chart](broken-reference) will be installed:
+#### Method A: Using 'Create Resource'
+
+1. Go to [strings.devtron.ai](https://strings.devtron.ai/base64-encoder) and encode your API key in base64. This base64 encoded key will be used while creating a secret in the next step.
+2. Go to Devtron's **Resource Browser** → (Select Cluster) → **Create Resource**
+3. Paste the following YAML and replace the key with your base64-encoded OpenAI key. Also, enter the namespace where the [AI Agent chart](broken-reference) will be installed:
 
 ```yaml
 apiVersion: v1
@@ -57,7 +61,29 @@ data:
   ## AnthropicKey: <base64-encoded-anthropic-key>     # For Anthropic
 ```
 
-### 4. Deploy AI Agent Chart
+#### Method B: Using kubectl command
+
+{% hint style="success" %}
+Unlike [Method A](broken-reference), this method doesn't require you to encode your LLM Key to Base64 format.
+{% endhint %}
+
+1. Go to Devtron's **Resource Browser** and click the [terminal icon](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/cluster-terminal.gif) next to the cluster where you wish to create the secret.
+2. Use the following kubectl command to create a secret.
+   * Replace `my-namespace` with the namespace where the AI Agent chart will be installed.
+   * Use the correct LLM key-name and your key-value after `--from-literal`
+
+```bash
+kubectl create secret generic ai-secret \
+  --namespace=my-namespace \
+  --from-literal=OpenAiKey='openai-key-here' \
+#  --from-literal=GoogleKey='google-key-here' \
+#  --from-literal=azureOpenAiKey='azure-key-here' \
+#  --from-literal=AnthropicKey='anthropic-key-here'
+```
+
+![Figure 2: Chart Configuration](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/secret-using-kubectl.jpg)
+
+### 3. Deploy AI Agent Chart
 
 {% hint style="warning" %}
 #### Where should I install the Chart?
@@ -71,7 +97,7 @@ Deploy the chart in the cluster whose workloads you wish to troubleshoot. You ma
 4. In the left-hand pane:
    * **App Name**: Give your app a name, e.g. `ai-agent-app`
    * **Project**: Select your project
-   * **Deploy to environment**: Choose the target environment (should be associated with the same namespace used while creating secret key in [Step 3](broken-reference))
+   * **Deploy to environment**: Choose the target environment (should be associated with the same namespace used while creating secret key in [Step 2](broken-reference))
    * **Chart Version**: Select the latest chart version.
    * **Chart Values**: Choose the default one for the latest version.
 5. In the `values.yaml` file editor, add the appropriate `additionalEnvVars` block based on your LLM provider. Use the tabs below to find the configuration snippet of some well-known LLM providers.
@@ -85,8 +111,8 @@ additionalEnvVars:
   - name: OPENAI_API_KEY
     valueFrom: 
       secretKeyRef:
-        key: OpenAiKey       ## Key of the secret created in Step 3
-        name: ai-secret      ## Name of the secret created in Step 3
+        key: OpenAiKey       ## Key of the secret created in Step 2
+        name: ai-secret      ## Name of the secret created in Step 2
   - name: CLUSTER_NAME
     value: document-nonprod  ## Name of the target cluster (optional)
 ```
@@ -100,8 +126,8 @@ additionalEnvVars:
   - name: GOOGLE_API_KEY
     valueFrom: 
       secretKeyRef:
-        key: GoogleKey       ## Key of the secret created in Step 3
-        name: ai-secret      ## Name of the secret created in Step 3
+        key: GoogleKey       ## Key of the secret created in Step 2
+        name: ai-secret      ## Name of the secret created in Step 2
   - name: CLUSTER_NAME
     value: document-nonprod  ## Name of the target cluster (optional)
 ```
@@ -121,8 +147,8 @@ additionalEnvVars:
   - name: AZURE_API_KEY
     valueFrom:
       secretKeyRef:
-        key: azureOpenAiKey      ## Key of the secret created in Step 3
-        name: ai-secret          ## Name of the secret created in Step 3
+        key: azureOpenAiKey      ## Key of the secret created in Step 2
+        name: ai-secret          ## Name of the secret created in Step 2
   - name: CLUSTER_NAME
     value: document-nonprod  ## Name of the target cluster (optional)
 ```
@@ -138,13 +164,13 @@ additionalEnvVars:
   - name: AWS_ACCESS_KEY_ID
     valueFrom:
       secretKeyRef:
-        key: awsAccessKeyId      ## Key of the Access Key ID created in Step 3
-        name: ai-secret          ## Name of the secret created in Step 3
+        key: awsAccessKeyId      ## Key of the Access Key ID created in Step 2
+        name: ai-secret          ## Name of the secret created in Step 2
   - name: AWS_SECRET_ACCESS_KEY
     valueFrom:
       secretKeyRef:
-        key: awsSecretAccessKey  ## Key of the secret created in Step 3
-        name: ai-secret          ## Name of the secret created in Step 3
+        key: awsSecretAccessKey  ## Key of the secret created in Step 2
+        name: ai-secret          ## Name of the secret created in Step 2
   - name: CLUSTER_NAME
     value: document-nonprod  ## Name of the target cluster (optional)
 ```
@@ -158,26 +184,26 @@ additionalEnvVars:
   - name: ANTHROPIC_API_KEY
     valueFrom: 
       secretKeyRef:
-        key: AnthropicKey    ## Key of the secret created in Step 3
-        name: ai-secret      ## Name of the secret created in Step 3
+        key: AnthropicKey    ## Key of the secret created in Step 2
+        name: ai-secret      ## Name of the secret created in Step 2
   - name: CLUSTER_NAME
     value: document-nonprod  ## Name of the target cluster (optional)
 ```
 {% endtab %}
 {% endtabs %}
 
-![Figure 2: Chart Configuration](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/chart-config-v4.jpg)
+![Figure 3: Chart Configuration](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/chart-config-v4.jpg)
 
 6. Click the **Deploy Chart** button.
 
-### 5. Check Service Endpoint
+### 4. Check Service Endpoint
 
 1. In the **App Details** page of the deployed chart, expand **Networking** and click on **Service**.
 2. Locate the service entry with the URL in the format: `<service-name>.<namespace>:<port>`. Note the values of `serviceName`, `namespace`, and `port` for the next step.
 
-![Figure 3: Service Endpoint of AI Agent Helm App](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/service-endpoint-v3.jpg)
+![Figure 4: Service Endpoint of AI Agent Helm App](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/service-endpoint-v3.jpg)
 
-### 6. Update ConfigMaps
+### 5. Update ConfigMaps
 
 1. In a new tab, go to **Resource Browser** → (Select Cluster) → **Config & Storage** → **ConfigMap**
 2. Edit the ConfigMaps:
@@ -189,7 +215,7 @@ additionalEnvVars:
        CLUSTER_CHAT_CONFIG: '{"<targetClusterID>": {"serviceName": "", "namespace": "", "port": ""}}'
        ```
 
-       ![Figure 4: Entry in 'orchestrator-cm' or 'devtron-cm' ConfigMap](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/devtron-cm-v3.jpg)
+       ![Figure 5: Entry in 'orchestrator-cm' or 'devtron-cm' ConfigMap](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/devtron-cm-v3.jpg)
    *   **dashboard-cm**
 
        To enable AI integration via feature flag, check if the below entry is present in the ConfigMap (create one if it doesn't exist).
@@ -198,9 +224,9 @@ additionalEnvVars:
        FEATURE_AI_INTEGRATION_ENABLE: "true"
        ```
 
-       ![Figure 5: Entry in 'dashboard-cm' ConfigMap](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/dashboard-cm-v3.jpg)
+       ![Figure 6: Entry in 'dashboard-cm' ConfigMap](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/dashboard-cm-v3.jpg)
 
-### 7. Restart Pods
+### 6. Restart Pods
 
 1. Go to **Resource Browser** → (Select Cluster) → **Workloads** → **Deployment**
 2.  Click the checkbox next to the following **Deployment** workloads and restart them using the **`⟳`** button:
@@ -208,9 +234,9 @@ additionalEnvVars:
     * `devtron`
     * `dashboard`
 
-    ![Figure 6: Restart 'devtron' and 'dashboard' deployment workloads](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/restart-deployments.jpg)
+    ![Figure 7: Restart 'devtron' and 'dashboard' deployment workloads](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/restart-deployments.jpg)
 
-### 8. Perform Hard Refresh
+### 7. Perform Hard Refresh
 
 Perform a hard refresh of the browser to clear the cache:
 
@@ -227,32 +253,32 @@ Devtron supports **Explain** option at the following screens (only for specific 
 
 **Path**: Resource Browser → (Select Cluster) → Workloads → Pod
 
-![Figure 7a: AI Explain for Pod Issues](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/explain-with-ai.jpg)
+![Figure 8a: AI Explain for Pod Issues](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/explain-with-ai.jpg)
 
-![Figure 7b: AI-assisted Troubleshooting](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/ai-explanation.jpg)
+![Figure 8b: AI-assisted Troubleshooting](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/ai-explanation.jpg)
 
 ### Pod Last Restart Snapshot
 
 **Path**: Resource Browser → (Select Cluster) → Workloads → Pod → Pod Last Restart Snapshot
 
-![Figure 8: AI Explain for Pod Restart Snapshot](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/pod-restart-explain.jpg)
+![Figure 9: AI Explain for Pod Restart Snapshot](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/pod-restart-explain.jpg)
 
 ### Event Errors
 
 **Path**: Resource Browser → (Select Cluster) → Events
 
-![Figure 9: AI Explain for Event Errors](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/events-explain.jpg)
+![Figure 10: AI Explain for Event Errors](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/events-explain.jpg)
 
 ### App Details - Application Status
 
 **Path**: Application → App Details → Application Status Drawer
 
-![Figure 10a: AI Explain at Application Status](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/appstatus-drawer-explain1.jpg)
+![Figure 11a: AI Explain at Application Status](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/appstatus-drawer-explain1.jpg)
 
-![Figure 10b: AI Explain at Application Status Drawer](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/appstatus-drawer-explain2.jpg)
+![Figure 11b: AI Explain at Application Status Drawer](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/appstatus-drawer-explain2.jpg)
 
 ### App Details - K8s Resources
 
 **Path**: Application → App Details → K8s Resources (tab) → Workloads
 
-![Figure 11: AI Explain at K8s Resources (tab)](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/app-workload-explain.jpg)
+![Figure 12: AI Explain at K8s Resources (tab)](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/app-workload-explain.jpg)
