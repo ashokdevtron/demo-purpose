@@ -81,7 +81,7 @@ kubectl create secret generic ai-secret \
 #  --from-literal=AnthropicKey='anthropic-key-here'
 ```
 
-![Figure 2: Chart Configuration](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/secret-using-kubectl.jpg)
+![Figure 2: Creating Secret using Cluster Terminal](https://devtron-public-asset.s3.us-east-2.amazonaws.com/images/kubernetes-resource-browser/devtron-intelligence/secret-using-kubectl.jpg)
 
 ### 3. Deploy AI Agent Chart
 
